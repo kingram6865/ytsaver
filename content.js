@@ -1,5 +1,26 @@
 let baseUrl = 'https://bastiat.hopto.org:3021';
 
+function waitForElement(selector, timeout = 5000) {
+  return new Promise((resolve, reject) => {
+    const el = document.querySelector(selector);
+    if (el) return resolve(el);
+
+    const obs = new MutationObserver(() => {
+      const elNow = document.querySelector(selector);
+      if (elNow) {
+        obs.disconnect();
+        resolve(elNow);
+      }
+    });
+
+    obs.observe(document.body, { childList: true, subtree: true });
+    setTimeout(() => {
+      obs.disconnect();
+      reject(new Error(`Timeout waiting for ${selector}`));
+    }, timeout);
+  });
+}
+
 function logFetch(url, options) {
   const startTime = Date.now();
   console.log('[Fetch] Request:', { url, options, startTime });
@@ -36,19 +57,30 @@ function getCurrentPlayPosition() {
 }
 
 const action = (value) => {
-  const url = getCurrentVideoId();
+  let message, reqBody;
+  const videoid = getCurrentVideoId();
   const time = getCurrentPlayPosition();
-  // alert(`url: ${url} time: ${time} status: ${value}`)
+
+  if (value) { // TODO: Add a branch that sends update: true
+    message = `${videoid} saved as watched with timestamp=${time}!`
+    reqBody = { videoid, time, complete: value, rewatch: 0, viewed: 1 }
+  } else {
+    message = `${videoid} saved as unwatched!`
+    reqBody = { videoid, time, complete: value, rewatch: 0, viewed: 0 }
+  }
+
   logFetch(`${baseUrl}/ytsaver/save`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ url, time, complete: value })
+    body: JSON.stringify(reqBody)
   })
-  .then(res => (res.status === 200) ? res.json() : Promise.reject())
-  .then(() => alert('Saved with timestamp!'))
-  .catch(() => alert(`Error saving id=(${url}) playtime=${time}`));
+  .then((x) => {
+    alert(message);
+    console.log(x)
+  })
+  .catch(() => alert(`Error saving id=${url} playtime=${time}`));
 }
 
 function createButton(text, value, onClick) {
@@ -68,32 +100,30 @@ function createButton(text, value, onClick) {
   return button;
 }
 
+// TODO: Add injectEndScreenButtons();
+// TODO: Add injectSuggestedVideoButtons();
+// 
+// 
+
 function injectMainVideoButtons() {
+  // TODO: Add a button that sends an update: true
   if (document.querySelector('#yt-save-watched-buttons')) return;
 
   const container = document.createElement('div');
   container.id = 'yt-save-watched-buttons';
   container.style.marginTop = '10px';  
 
-  // const saveButton = createButton('💾 Save', false, (value) => { 
-  //   alert(`Pressed Save Button value is ${value}`)
-  // });
-
-  // const watchedButton = createButton('👀 Watched', true, (value) => {
-  //   alert(`Pressed the Watched button value is ${value}`)
-  // });
-
   const saveButton = createButton('💾 Save', false, action);
-
   const watchedButton = createButton('👀 Watched', true, action);
 
   container.appendChild(saveButton);
   container.appendChild(watchedButton);
   
-  const targetParent = document.querySelector('#above-the-fold #title');
-  const target = targetParent.querySelector(':nth-child(2)');
+  const targetParent = document.querySelector('#above-the-fold #title') ;
 
-  if (target) {
+  const target = targetParent.children[1] || document.querySelector('#info-contents');
+
+  if (targetParent) {
     target.before(container);
   } else {
     console.error("Target element not found!");
@@ -106,8 +136,6 @@ const observer = new MutationObserver(() => {
 
 observer.observe(document.body, { childList: true, subtree: true });
 
-window.addEventListener('load', () => {
+window.addEventListener('yt-navigate-finish', () => {
   injectMainVideoButtons();
-  // injectEndScreenButtons();
-  // injectSuggestedVideoButtons();
 });
