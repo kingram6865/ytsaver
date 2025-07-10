@@ -61,7 +61,7 @@ const action = (value) => {
   const videoid = getCurrentVideoId();
   const time = getCurrentPlayPosition();
 
-  if (value) { // TODO:
+  if (value) { // TODO: Add a branch that sends update: true
     message = `${videoid} saved as watched with timestamp=${time}!`
     reqBody = { videoid, time, complete: value, rewatch: 0, viewed: 1 }
   } else {
@@ -100,7 +100,13 @@ function createButton(text, value, onClick) {
   return button;
 }
 
+// TODO: Add injectEndScreenButtons();
+// TODO: Add injectSuggestedVideoButtons();
+// 
+// 
+
 function injectMainVideoButtons() {
+  // TODO: Add a button that sends an update: true
   if (document.querySelector('#yt-save-watched-buttons')) return;
 
   const container = document.createElement('div');
@@ -132,5 +138,4 @@ observer.observe(document.body, { childList: true, subtree: true });
 
 window.addEventListener('yt-navigate-finish', () => {
   injectMainVideoButtons();
-
 });
