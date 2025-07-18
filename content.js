@@ -1,14 +1,11 @@
 let injectionPromise = null;
 let baseUrl = 'https://bastiat.hopto.org:3021';
+// TODO: Add injectEndScreenButtons();
 
-/* supported card-types in priority order */
 const CARD_SELECTOR = [
-  /* July‑2025 sidebar experiment */
   'yt-lockup-view-model.ytd-item-section-renderer.lockup',
-  /* 2024–25 “big thumbnail” test under the player */
   '#below  ytd-video-renderer',
   '#primary ytd-video-renderer',
-  /* pre‑2024 compact sidebar */
   '#secondary ytd-compact-video-renderer'
 ].join(',');
 
@@ -43,11 +40,10 @@ function showNotification(message, duration = 6000) {
   notification.className = 'yt-save-notification';
   notification.textContent = message;
   document.body.appendChild(notification);
-  
-  // Show notification
+
+  // Show notification and hide after a few seconds
   setTimeout(() => notification.classList.add('show'), 10);
   
-  // Hide after duration
   setTimeout(() => {
     notification.classList.remove('show');
     setTimeout(() => notification.remove(), 300);
@@ -220,51 +216,7 @@ async function injectMainVideoButtons() {
   });
 
   return injectionPromise;
-
-  // try {
-  //   above = await waitForElement('#above-the-fold');
-  // } catch {
-  //   console.warn('[yt‑saver] #above-the-fold not found – buttons not injected');
-  //   return;    
-  // }
-
-  // above.insertBefore(container, above.firstChild);
-
-
-
-  // const saveButton = createButton('💾 Save', 0, action);
-  // const watchedButton = createButton('👀 Watched', 1, action);
-  // const updateButton = createButton('🔄 Update', 2, action);
-
-  // container.appendChild(saveButton);
-  // container.appendChild(watchedButton);
-  // container.appendChild(updateButton);
-  
-//  // const targetParent = document.querySelector('#above-the-fold #title');
-//  // const target = targetParent.children[1] || document.querySelector('#info-contents');
-
-//   let targetCandidate = 
-//     document.querySelector('#above-the-fold #title')?.children?.[1] ||
-//     document.querySelector('#info-contents') ||
-//     null;
-
-//   const target = normaliseTarget(targetCandidate);
-
-//   if (!target) {
-//     console.warn('[yt‑saver] No suitable anchor found for buttons');
-//     return;
-//   }
-
-//   target.parentNode.insertBefore(container, target);
-
-// //   if (target) {
-// //     target.before(container);
-// //   } else {
-// //     console.warn("[yt‑saver] Could not find a place to inject buttons");
-// //   }
 }
-
-// TODO: Add injectEndScreenButtons();
 
 function enhance(card) {
   if (card.dataset.saveEnhanced) return; // skip of already processed
