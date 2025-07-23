@@ -1,0 +1,22 @@
+.yt‑saver‑btns {
+  margin-top: 10px;        /* what you had inline */
+  display: flex;
+  gap: 8px;                /* space between buttons */
+}
+
+/* shared look & feel for all buttons */
+.yt‑saver‑btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #ff0000;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  border: none;            /* reset YouTube defaults */
+}
+
+/* optional :hover effect */
+.yt‑saver‑btn:hover {
+  opacity: .85;
+}

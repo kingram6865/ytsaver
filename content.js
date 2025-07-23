@@ -130,8 +130,9 @@ const action = (value) => {
     body: JSON.stringify(reqBody)
   })
   .then((x) => {
-    showNotification(message);
-    console.log(x)
+    // showNotification(message);
+    showNotification(x.messages.responseMessage);
+    console.log(x.messages.responseMessage)
   })
   .catch(() => alert(`Error saving id=${url} playtime=${time}`));
 }
@@ -165,13 +166,8 @@ const actionSuggested = (value, btn) => {
 
 function createButton(text, value, onClick) {
   const button = document.createElement('button');
+  button.className = 'yt‑saver‑btn';
   button.textContent = text;
-  button.style.margin = '4px';
-  button.style.padding = '6px 10px';
-  button.style.borderRadius = '6px';
-  button.style.cursor = 'pointer';
-  button.style.backgroundColor = '#ff0000';
-  button.style.color = '#fff';
   button.onclick = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -202,7 +198,8 @@ async function injectMainVideoButtons() {
 
     const container = document.createElement('div');
     container.id = 'yt-save-watched-buttons';
-    container.style.marginTop = '10px';  
+    // container.style.marginTop = '10px';
+    container.className = 'yt‑saver‑btns';
   
     container.append(
       createButton('💾 Save', 0, action),
