@@ -246,7 +246,7 @@ function enhanceVideoWallAnchor(a) {
     right: '6px',
     zIndex: '10000'
   });  
-  
+
   a.appendChild(saveBtn);
   a.appendChild(checkBtn);
 
@@ -600,13 +600,18 @@ function enhance(card) {
     card.querySelector('#meta, #dismissible') ||                 // old layouts
     card;
 
-  const btn1 = createButton('💾 SaveThis', {videoid: videoId, title}, actionSuggested);
+  const btn1 = createButton('💾 Save', {videoid: videoId, title}, actionSuggested);
   const btn2 = createButton('☑️ Check', {videoid: videoId, title}, checkSuggested);
+
+  const btnWrapper = document.createElement('div');
+  btnWrapper.className = 'yt-saver-btns';
+  btnWrapper.append(btn1, btn2);
+
+
   if (meta.append) {
-    meta.append(btn1, btn2);
+    meta.append(btnWrapper);
   } else {
-    meta.appendChild(btn1);
-    meta.appendChild(btn2);
+    meta.appendChild(btnWrapper);
   }
 }
 

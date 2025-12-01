@@ -1,77 +1,61 @@
-.yt‑saver‑btns {
-  margin-top: 10px;        /* what you had inline */
+/* Flex wrapper for groups of buttons on regular video cards */
+.yt-saver-btns {
+  margin-top: 10px;  /* what you previously had inline */
   display: flex;
-  gap: 8px;                /* space between buttons */
+  flex-direction: row;
+  gap: 8px;
 }
 
-/* shared look & feel for all buttons */
-.yt‑saver‑btn {
-  /* padding: 6px 10px;
+/* Shared look & feel for all extension buttons */
+.yt-saver-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
   border-radius: 6px;
-  cursor: pointer; */
+  cursor: pointer;
   background: #ff0000;
   color: #fff;
   font-size: 14px;
   line-height: 1;
-  border: none;            /* reset YouTube defaults */
+  border: none; /* reset YouTube defaults */
 }
 
-/* optional :hover effect */
-.yt‑saver‑btn:hover {
-  opacity: .85;
+.yt-saver-btn:hover {
+  filter: brightness(1.1);
 }
+
+.yt-saver-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ----- End-screen / video-wall overlay ----- */
 
 .yt-endsave-anchor {
   position: relative;
 }
 
-
-.yt-saver-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #ff0000;
-  color: #fff;
-  border: none;
-  margin-left: 10px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.yt-saver-btn:hover { filter: brightness(1.1); }
-.yt-saver-btn:disabled { opacity: 0.6; cursor: default; }
-
-/* old 2025 12 01 0828 PST
-.yt-endsave-btn {
+.yt-endsave-buttons {
   position: absolute;
+  top: 6px;
   right: 6px;
-  top: auto;
-  bottom: auto;
-  font-size: 12px;
-  padding: 6px 8px;
-  border-radius: 6px;
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
   z-index: 10000;
-  pointer-events: auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-} */
+}
 
-
+/* Buttons when used in overlay – reuse base button styles but no absolute positioning */
 .yt-endsave-btn {
-  position: static;      /* <— important */
-  /* display: inline-flex;
-  align-items: center; */
-  padding: 6px 8px;
+  position: static;
   font-size: 12px;
+  padding: 6px 8px;
   border-radius: 6px;
-  background: rgba(0,0,0,0.75);
-  color: white;
   pointer-events: auto;
 }
 
-.yt-endsave-btn--bottom-right { bottom: 6px; }
-.yt-endsave-btn--top-right { top: 6px; }
+/* ----- Toast notification ----- */
 
 .yt-save-notification {
   position: fixed;
@@ -89,7 +73,12 @@
   max-width: 300px;
   font-size: 14px;
 }
-.yt-save-notification.show { opacity: 1; }
+
+.yt-save-notification.show {
+  opacity: 1;
+}
+
+/* ----- Server settings button next to main controls ----- */
 
 .yt-saver-settings {
   margin-left: 8px;
@@ -100,13 +89,6 @@
   opacity: 0.9;
 }
 
-.yt-saver-settings:hover { opacity: 1; }
-
-.yt-endsave-buttons {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  display: flex;
-  gap: 6px;
-  z-index: 10000;
+.yt-saver-settings:hover {
+  opacity: 1;
 }
