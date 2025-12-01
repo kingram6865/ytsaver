@@ -6,9 +6,9 @@
 
 /* shared look & feel for all buttons */
 .yt‑saver‑btn {
-  padding: 6px 10px;
+  /* padding: 6px 10px;
   border-radius: 6px;
-  cursor: pointer;
+  cursor: pointer; */
   background: #ff0000;
   color: #fff;
   font-size: 14px;
@@ -19,4 +19,94 @@
 /* optional :hover effect */
 .yt‑saver‑btn:hover {
   opacity: .85;
+}
+
+.yt-endsave-anchor {
+  position: relative;
+}
+
+
+.yt-saver-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ff0000;
+  color: #fff;
+  border: none;
+  margin-left: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.yt-saver-btn:hover { filter: brightness(1.1); }
+.yt-saver-btn:disabled { opacity: 0.6; cursor: default; }
+
+/* old 2025 12 01 0828 PST
+.yt-endsave-btn {
+  position: absolute;
+  right: 6px;
+  top: auto;
+  bottom: auto;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  z-index: 10000;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+} */
+
+
+.yt-endsave-btn {
+  position: static;      /* <— important */
+  /* display: inline-flex;
+  align-items: center; */
+  padding: 6px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.75);
+  color: white;
+  pointer-events: auto;
+}
+
+.yt-endsave-btn--bottom-right { bottom: 6px; }
+.yt-endsave-btn--top-right { top: 6px; }
+
+.yt-save-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #800000;
+  color: white;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgb(243 235 127);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  max-width: 300px;
+  font-size: 14px;
+}
+.yt-save-notification.show { opacity: 1; }
+
+.yt-saver-settings {
+  margin-left: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.yt-saver-settings:hover { opacity: 1; }
+
+.yt-endsave-buttons {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 6px;
+  z-index: 10000;
 }
