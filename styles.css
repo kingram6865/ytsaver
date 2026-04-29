@@ -47,12 +47,40 @@
 }
 
 /* Buttons when used in overlay – reuse base button styles but no absolute positioning */
+.yt-endsave-anchor {
+  position: relative !important;
+}
+
 .yt-endsave-btn {
-  position: static;
-  font-size: 12px;
+  position: absolute !important;
+  top: 6px !important;
+  z-index: 999999 !important;
+
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 34px;
+  min-height: 28px;
   padding: 6px 8px;
+
+  font-size: 12px;
+  line-height: 1;
   border-radius: 6px;
-  pointer-events: auto;
+  border: none;
+
+  background: rgba(255, 0, 0, 0.95);
+  color: #fff;
+  cursor: pointer;
+  pointer-events: auto !important;
+}
+
+.yt-endsave-btn--save {
+  right: 46px !important;
+}
+
+.yt-endsave-btn--check {
+  right: 6px !important;
 }
 
 /* ----- Toast notification ----- */

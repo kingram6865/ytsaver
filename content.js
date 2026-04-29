@@ -14,28 +14,64 @@ function emitBaseUrlChange() {
   }
 }
 
-
-
 // ---------------------
 
+let enhanceSweepTimer = null;
+let enhanceSweepStopTimer = null;
+
+function scheduleEnhanceSweep() {
+  clearTimeout(enhanceSweepTimer);
+
+  enhanceSweepTimer = setTimeout(() => {
+    enhanceAllCards();
+  }, 150);
+
+  clearTimeout(enhanceSweepStopTimer);
+
+  enhanceSweepStopTimer = setTimeout(() => {
+    clearTimeout(enhanceSweepTimer);
+    enhanceSweepTimer = null;
+  }, 12000);
+}
 
 const CARD_SELECTOR = [
   'ytd-rich-grid-media',
   'ytd-rich-item-renderer #content',
-  
-  'yt-lockup-view-model.ytd-item-section-renderer.lockup',
+  'yt-lockup-view-model',
   '#below  ytd-video-renderer',
   '#primary ytd-video-renderer',
   '#secondary ytd-compact-video-renderer',
   'ytd-video-renderer',
-  'ytd-compact-video-renderer'
+  'ytd-compact-video-renderer',
+  'yt-lockup-view-model.ytd-watch-next-secondary-results-renderer.lockup', // Added 2025 12 06 0058
+  '.yt-lockup-view-model-wiz' // Added 2025 12 06 0058
 ].join(',');
 
 
-const END_SCREEN_CONTAINER = '.ytp-endscreen-content';
-const END_CARD_ANCHOR_SELECTOR = `${END_SCREEN_CONTAINER} a[href*="/watch"]`;
-const VIDEO_WALL_CONTAINER = '.ytp-videowall-content, .html5-endscreen';
-const VIDEO_WALL_ANCHOR_SELECTOR = `${VIDEO_WALL_CONTAINER} a[href*="/watch"]`;
+const END_SCREEN_CONTAINER = '.ytp-endscreen-content, .html5-endscreen';
+const END_CARD_SELECTOR = [
+  '.ytp-endscreen-content a[href*="/watch"]',
+  '.html5-endscreen a[href*="/watch"]',
+  '.ytp-ce-element a[href*="/watch"]',
+  '.ytp-ce-video a[href*="/watch"]',
+  'a.ytp-ce-covering-overlay[href*="/watch"]',
+  'a.ytp-modern-videowall-still[href*="/watch"]'
+].join(',');
+
+
+const VIDEO_WALL_CONTAINER = [
+  '.ytp-videowall-content',
+  '.html5-endscreen',
+  '.ytp-fullscreen-grid-main-content',
+  '.ytp-fullscreen-grid-stills-container'
+].join(',');
+
+const VIDEO_WALL_ANCHOR_SELECTOR = [
+  '.ytp-videowall-content a[href*="/watch"]',
+  '.html5-endscreen a[href*="/watch"]',
+  '.ytp-fullscreen-grid-main-content a.ytp-modern-videowall-still[href*="/watch"]',
+  '.ytp-fullscreen-grid-stills-container a.ytp-modern-videowall-still[href*="/watch"]'
+].join(',');
 
 let styleElement = document.getElementById('yt-saver-styles');
 
@@ -45,113 +81,6 @@ if (!styleElement) {
   document.head.appendChild(styleElement);
 }
 
-styleElement.textContent += `
-  .yt-endsave-anchor {
-    position: relative !important;
-  }
-
-  .yt-endsave-buttons {
-    position: absolute !important;
-    top: 6px !important;
-    right: 6px !important;
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    gap: 6px !important;
-    z-index: 10000 !important;
-  }
-
-  .yt-endsave-btn {
-    position: static !important;
-    padding: 6px 8px;
-    font-size: 12px;
-    border-radius: 6px;
-    background: rgba(0,0,0,0.75);
-    color: #fff;
-    pointer-events: auto;
-  }
-`;
-
-// if (!styleElement.textContent.includes('.yt-saver-btn {')) {
-//   styleElement.textContent += `
-//     .yt-saver-btn {
-//       background-color: #ff0000;
-//       color: #fff;
-//       border: none;
-//       margin-left: 10px;
-//       padding: 6px 10px;
-//       border-radius: 6px;
-//       cursor: pointer;
-//     }
-//     .yt-saver-btn:hover { filter: brightness(1.1); }
-//     .yt-saver-btn:disabled { opacity: 0.6; cursor: default; }
-//   `;
-// }
-
-// if (!styleElement.textContent.includes('.yt-endsave-btn {')) {
-//   styleElement.textContent += `
-//     .yt-endsave-btn {
-//       position: absolute;
-//       right: 6px;
-//       top: auto;
-//       bottom: auto;
-//       font-size: 12px;
-//       padding: 6px 8px;
-//       border-radius: 6px;
-//       z-index: 10000;
-//       pointer-events: auto;
-//     }
-//   `;
-// }
-
-// if (!styleElement.textContent.includes('.yt-endsave-btn--bottom-right')) {
-//   styleElement.textContent += `
-//     .yt-endsave-btn--bottom-right { bottom: 6px; }
-//   `;
-// }
-
-// if (!styleElement.textContent.includes('.yt-endsave-btn--top-right')) {
-//   styleElement.textContent += `
-//     .yt-endsave-btn--top-right { top: 6px; }
-//   `;
-// }
-
-// if (!styleElement.textContent.includes('.yt-save-notification')) {
-//   styleElement.textContent += `
-//     .yt-save-notification {
-//       position: fixed;
-//       bottom: 20px;
-//       right: 20px;
-//       background-color: #800000;
-//       color: white;
-//       font-weight: 700;
-//       padding: 12px 24px;
-//       border-radius: 4px;
-//       box-shadow: 0 4px 8px rgb(243 235 127);
-//       z-index: 9999;
-//       opacity: 0;
-//       transition: opacity 0.3s ease-in-out;
-//       max-width: 300px;
-//       font-size: 14px;
-//     }
-//     .yt-save-notification.show { opacity: 1; }
-//   `;
-// }
-
-// if (!styleElement.textContent.includes('.yt-saver-settings')) {
-//   styleElement.textContent += `
-//     .yt-saver-settings {
-//       margin-left: 8px;
-//       padding: 6px 8px;
-//       border-radius: 6px;
-//       font-size: 12px;
-//       cursor: pointer;
-//       opacity: 0.9;
-//     }
-//     .yt-saver-settings:hover { opacity: 1; }
-//   `;
-// }
-
 function showNotification(message, duration = 6000) {
   const notification = document.createElement('div');
   notification.className = 'yt-save-notification';
@@ -160,7 +89,7 @@ function showNotification(message, duration = 6000) {
 
   // Show notification and hide after a few seconds
   setTimeout(() => notification.classList.add('show'), 10);
-  
+
   setTimeout(() => {
     notification.classList.remove('show');
     setTimeout(() => notification.remove(), 300);
@@ -170,6 +99,7 @@ function showNotification(message, duration = 6000) {
 // Added 2025-09-02
 function titleFromEndscreenAnchor(a) {
   return a.querySelector('.ytp-endscreen-title')?.textContent?.trim()
+      || a.querySelector('.ytp-modern-videowall-still-info-title')?.textContent?.trim()
       || a.getAttribute('aria-label')?.split(' by ')[0]?.trim()
       || '';
 }
@@ -190,14 +120,9 @@ function enhanceEndscreenAnchor(a) {
 
   const title = titleFromEndscreenAnchor(a);
   const btn = createButton('💾', { videoid, title }, actionSuggested);
-  btn.classList.add('yt-endsave-btn');
+  btn.classList.add('yt-endsave-btn', 'yt-endsave-btn--check');
   btn.title = 'Save this suggested video';
   a.classList.add('yt-endsave-anchor');
-  // // Ensure a positioning context so the absolute button lands bottom-right
-  // if (!/relative|absolute|fixed|sticky/.test(getComputedStyle(a).position)) {
-  //   a.style.position = 'relative';
-  // }
-
 
   a.appendChild(btn);
 }
@@ -212,22 +137,15 @@ function enhanceVideoWallAnchor(a) {
 
   const title = titleFromVideoWallAnchor(a);
   const saveBtn = createButton('💾', { videoid, title }, actionSuggested);
-  saveBtn.classList.add('yt-endsave-btn');
+  saveBtn.classList.add('yt-endsave-btn', 'yt-endsave-btn--save');
   // saveBtn.classList.add('yt-endsave-btn', 'yt-endsave-btn--top-right');
   saveBtn.classList.add('yt-endsave-btn');
   saveBtn.title = 'Save this suggested video';
 
   const checkBtn = createButton('☑️', { videoid, title }, checkSuggested);
-  checkBtn.classList.add('yt-endsave-btn');
+  checkBtn.classList.add('yt-endsave-btn', 'yt-endsave-btn--check');
   checkBtn.title = 'Check status of this video';
 
-  // a.classList.add('yt-endsave-anchor');
-
-  
-  // const wrapper = document.createElement('div');
-  // wrapper.className = 'yt-endsave-buttons';
-  // wrapper.append(saveBtn, checkBtn);
-  // a.appendChild(wrapper);  
   const cs = getComputedStyle(a);
   if (cs.position === 'static') {
     a.style.position = 'relative';
@@ -245,17 +163,17 @@ function enhanceVideoWallAnchor(a) {
     top: '6px',
     right: '6px',
     zIndex: '10000'
-  });  
+  });
 
   a.appendChild(saveBtn);
   a.appendChild(checkBtn);
 
 }
 
+// UPDATED [2026-04-28 1500 PDT]: query the document because the newer 3-card endscreen may not nest
+// anchors under only .ytp-endscreen-content
 function injectEndScreenButtons() {
-  const container = document.querySelector(END_SCREEN_CONTAINER);
-  if (!container) return;
-  container.querySelectorAll(END_CARD_ANCHOR_SELECTOR).forEach(enhanceEndscreenAnchor);
+  document.querySelectorAll(END_CARD_SELECTOR).forEach(enhanceEndscreenAnchor);
 }
 
 // ------ baseUrl config
@@ -543,7 +461,7 @@ function normaliseTarget(raw) {
   // 2. Undefined/null -> null
   if (!raw) return null;
   // 3. Anything else we assume is a single node
-  return raw;  
+  return raw;
 }
 
 async function injectMainVideoButtons() {
@@ -559,7 +477,7 @@ async function injectMainVideoButtons() {
     container.id = 'yt-save-watched-buttons';
     // container.style.marginTop = '10px';
     container.className = 'yt-saver-btns';
-  
+
     container.append(
       createButton('💾 Save', 0, action),
       createButton('👀 Watched', 1, action),
@@ -585,20 +503,47 @@ function injectVideoWallButtons() {
 }
 
 function enhance(card) {
-  if (card.dataset.saveEnhanced) return; // skip of already processed
-  card.dataset.saveEnhanced = 'true';
+  const existingButtons = card.querySelector('.yt-saver-btns');
 
-  const linkEl = card.querySelector('a[href*="/watch"]');
+  if (card.dataset.saveEnhanced && existingButtons) return;
+
+  if (card.dataset.saveEnhanced && !existingButtons) {
+    delete card.dataset.saveEnhanced;
+  }
+
+  const isLockup = card.matches?.('yt-lockup-view-model');
+
+  const linkEl = isLockup
+    ? card.querySelector('a.ytLockupMetadataViewModelTitle[href*="/watch"]')
+    : card.querySelector('a[href*="/watch"]');
+
   if (!linkEl) return;
+
+  const meta = isLockup
+    ? card.querySelector('.ytLockupMetadataViewModelTextContainer')
+    : (
+      card.querySelector('.ytLockupViewModelMetadata') ||
+      card.querySelector('.yt-lockup-view-model-wiz__metadata') ||
+      card.querySelector('#meta, #dismissible') ||
+      card
+    );
+
+  if (!meta) return;
+
+  if (meta.querySelector(':scope > .yt-saver-btns')) {
+    card.dataset.saveEnhanced = 'true';
+    return;
+  }
 
   const url = linkEl.href
   const videoId = new URL(url, location.origin).searchParams.get('v') ?? '';
-  const title = card.querySelector('#video-title, h3, .yt-content-metadata-view-model-wiz__metadata-text')?.textContent.trim() ?? '';
+  if (!videoId) return;
 
-  const meta =
-    card.querySelector('.yt-lockup-view-model-wiz__metadata') || // new layout
-    card.querySelector('#meta, #dismissible') ||                 // old layouts
-    card;
+  const title =
+    card.querySelector('a.ytLockupMetadataViewModelTitle span')?.textContent?.trim() ||
+    card.querySelector('h3[title]')?.getAttribute('title')?.trim() ||
+    card.querySelector('#video-title, h3, .yt-content-metadata-view-model-wiz__metadata-text')?.textContent.trim() ||
+    '';
 
   const btn1 = createButton('💾 Save', {videoid: videoId, title}, actionSuggested);
   const btn2 = createButton('☑️ Check', {videoid: videoId, title}, checkSuggested);
@@ -607,27 +552,39 @@ function enhance(card) {
   btnWrapper.className = 'yt-saver-btns';
   btnWrapper.append(btn1, btn2);
 
-
-  if (meta.append) {
-    meta.append(btnWrapper);
-  } else {
-    meta.appendChild(btnWrapper);
-  }
+  // if (meta.append) {
+  //   meta.append(btnWrapper);
+  // } else {
+  //   meta.appendChild(btnWrapper);
+  // }
+  meta.append(btnWrapper);
+  card.dataset.saveEnhanced = 'true';
 }
 
-document.querySelectorAll(CARD_SELECTOR).forEach(enhance);
+function enhanceAllCards() {
+  document.querySelectorAll(CARD_SELECTOR).forEach(enhance);
+}
+
+// setInterval(enhanceAllCards, 1000);
 
 const observer = new MutationObserver(muts => {
+  let shouldSweep = false;
+
   muts.forEach(m => {
     m.addedNodes.forEach(node => {
       if (node.nodeType !== 1) return;
-        if (node.matches?.(CARD_SELECTOR)) {
-          enhance(node);
+
+        if (node.matches?.(CARD_SELECTOR) || node.querySelector?.(CARD_SELECTOR)) {
+          shouldSweep = true;
         }
-        
-        node.querySelectorAll?.(CARD_SELECTOR).forEach(enhance);
+        // node.querySelectorAll?.(CARD_SELECTOR).forEach(enhance);
     });
   });
+
+  if (shouldSweep) {
+    scheduleEnhanceSweep();
+  }
+
   injectMainVideoButtons();
   injectVideoWallButtons();
   injectEndScreenButtons();
@@ -636,9 +593,13 @@ const observer = new MutationObserver(muts => {
 observer.observe(document.body, { childList: true, subtree: true });
 
 window.addEventListener('yt-navigate-finish', () => {
+  enhanceAllCards();
+  scheduleEnhanceSweep();
   injectMainVideoButtons();
   injectVideoWallButtons();
   injectEndScreenButtons();
+  // setTimeout(enhanceAllCards, 250);
+  // setTimeout(enhanceAllCards, 1000);
 });
 
 document.querySelector('video')?.addEventListener('ended', injectEndScreenButtons);
