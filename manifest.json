@@ -11,7 +11,7 @@
   "host_permissions": ["*://*.youtube.com/*", "<all_urls>"],
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/*", "*://*.youtube.com/"],
+      "matches": ["*://*.youtube.com/*", "*://*.youtube.com/", "*://*.youtube.com/@*"],
       "css": ["styles.css"],
       "js": ["content.js"]
     }
